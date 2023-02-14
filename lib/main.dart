@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rider_app/AllScreens/loginscreen.dart';
 import 'package:rider_app/AllScreens/mainscreen.dart';
 
 void main() {
@@ -10,16 +11,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Uber Clone',
+      title: 'Taxi Rider App',
       theme: ThemeData(
-        fontFamily: 'Signatra',
+        fontFamily: 'Brand Bold',
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MainScreen(),
+      home: LoginScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
-
-
