@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:rider_app/AllScreens/loginscreen.dart';
 
 class RegistrationScreen extends StatelessWidget {
+  static const String idScreen = "register";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,7 +124,8 @@ class RegistrationScreen extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  print("Clicked");
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, LoginScreen.idScreen, (route) => false);
                 },
                 child: Text("Already have an account? Login here."),
               )
