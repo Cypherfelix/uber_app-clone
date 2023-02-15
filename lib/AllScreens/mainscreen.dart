@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:rider_app/AllWidgets/DividerWidget.dart';
 import 'package:rider_app/AllWidgets/progressDialog.dart';
+import 'package:rider_app/Assistants/assistantMethods.dart';
 
 class MainScreen extends StatefulWidget {
   static const String idScreen = "main";
@@ -55,6 +56,10 @@ class _MainScreenState extends State<MainScreen> {
 
     newGoogleMapController
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+
+    String address = await AssistantMethods.searchCoordinateAddress(position);
+
+    print(address);
   }
 
   static const CameraPosition _kGooglePlex = CameraPosition(
