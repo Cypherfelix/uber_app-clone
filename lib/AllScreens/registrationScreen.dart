@@ -140,22 +140,38 @@ class RegistrationScreen extends StatelessWidget {
                       child: Container(
                         height: 50.0,
                         child: Center(
-                          child: Text(
-                            "Create an Account",
-                            style: TextStyle(
-                                fontSize: 18.0, fontFamily: "Brand Bold"),
-                          ),
+                          child: waiting
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  // ignore: prefer_const_literals_to_create_immutables
+                                  children: [
+                                    const Text(
+                                      'Loading...',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  ],
+                                )
+                              : Text(
+                                  "Create an Account",
+                                  style: TextStyle(
+                                      fontSize: 18.0, fontFamily: "Brand Bold"),
+                                ),
                         ),
                       ),
                       style: ButtonStyle(
-                          foregroundColor:
-                              MaterialStatePropertyAll(Colors.white),
-                          shape: MaterialStatePropertyAll(
-                              new RoundedRectangleBorder(
-                                  borderRadius:
-                                      new BorderRadius.circular(24.0))),
-                          backgroundColor:
-                              MaterialStatePropertyAll(Colors.yellow)),
+                        foregroundColor: MaterialStatePropertyAll(Colors.white),
+                        shape: MaterialStatePropertyAll(
+                            new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(24.0))),
+                        backgroundColor:
+                            MaterialStatePropertyAll(Colors.yellow),
+                      ),
                     ),
                   ],
                 ),
