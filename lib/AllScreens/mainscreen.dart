@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:rider_app/AllWidgets/DividerWidget.dart';
+import 'package:rider_app/AllWidgets/progressDialog.dart';
 
 class MainScreen extends StatefulWidget {
   static const String idScreen = "main";
-
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -17,6 +19,43 @@ class _MainScreenState extends State<MainScreen> {
   GoogleMapController newGoogleMapController;
 
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
+  Position currentPosition;
+
+  var geoLocator = Geolocator();
+
+  double bottomPaddingOfMap = 0;
+
+  // void getLocationPermission() async {
+  //   var location = new Location();
+  //   try {
+  //     location.requestPermission(); //to lunch location permission popup
+  //   } on PlatformException catch (e) {
+  //     if (e.code == 'PERMISSION_DENIED') {
+  //       print('Permission denied');
+  //     }
+  //   }
+  // }
+
+  void locatePosition() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      await Geolocator.requestPermission();
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    currentPosition = position;
+
+    LatLng latLngPosition = new LatLng(position.latitude, position.longitude);
+
+    CameraPosition cameraPosition =
+        new CameraPosition(target: latLngPosition, zoom: 14);
+
+    newGoogleMapController
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+  }
 
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -98,12 +137,20 @@ class _MainScreenState extends State<MainScreen> {
       body: Stack(
         children: [
           GoogleMap(
+            padding: EdgeInsets.only(bottom: bottomPaddingOfMap),
             initialCameraPosition: _kGooglePlex,
             myLocationButtonEnabled: true,
+            myLocationEnabled: true,
+            zoomControlsEnabled: true,
+            zoomGesturesEnabled: true,
             mapType: MapType.normal,
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
               newGoogleMapController = controller;
+              setState(() {
+                bottomPaddingOfMap = 320.0;
+              });
+              locatePosition();
             },
           ),
           Positioned(
@@ -141,7 +188,7 @@ class _MainScreenState extends State<MainScreen> {
               right: 0.0,
               bottom: 0.0,
               child: Container(
-                height: 360.0,
+                height: 310.0,
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
