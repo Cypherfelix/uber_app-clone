@@ -17,7 +17,6 @@ class AssistantMethods {
 
     if (response != "Failed") {
       // placeAddress = response["results"][0]["formatted_address"];
-      print(response.toString());
 
       st1 = response["results"][0]["address_components"][0]["long_name"];
       st2 = response["results"][0]["address_components"][2]["long_name"];
