@@ -3,7 +3,10 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:provider/provider.dart';
+import 'package:rider_app/Assistants/requestAssistant.dart';
 import 'package:rider_app/DataHandler/appData.dart';
+import 'package:rider_app/Models/Address.dart';
+import 'package:rider_app/configMap.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key key}) : super(key: key);
@@ -128,6 +131,9 @@ class _SearchScreenState extends State<SearchScreen> {
                           child: Padding(
                             padding: EdgeInsets.all(3.0),
                             child: TextField(
+                              onChanged: (value) {
+                                findPlaces(value);
+                              },
                               controller: dropoffTextEditingController,
                               decoration: InputDecoration(
                                 hintText: "Where to ?",
@@ -154,5 +160,18 @@ class _SearchScreenState extends State<SearchScreen> {
         ],
       ),
     );
+  }
+}
+
+void findPlaces(String placename) async {
+  if (placename.length > 0) {
+    String url =
+        "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placename&components=country:ke&key=$mapKey";
+
+    var res = await RequestAssistant.getRequest(url);
+
+    if (res.toString().toLowerCase() == "Failed".toLowerCase()) {
+      return;
+    }
   }
 }

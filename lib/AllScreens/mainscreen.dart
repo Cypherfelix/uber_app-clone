@@ -47,8 +47,19 @@ class _MainScreenState extends State<MainScreen> {
     newGoogleMapController
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
-    String address =
-        await AssistantMethods.searchCoordinateAddress(position, context);
+    String address = await AssistantMethods.searchCoordinateAddress(
+        position,
+        context,
+        Provider.of<AppData>(context, listen: false)
+            .updatePickUpLocationAddress);
+
+    address = await AssistantMethods.searchCoordinateAddress(
+        position,
+        context,
+        Provider.of<AppData>(context, listen: false)
+            .updateCurrentLocationAddress);
+
+    print(address);
   }
 
   static const CameraPosition _kGooglePlex = CameraPosition(

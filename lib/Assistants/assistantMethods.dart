@@ -7,7 +7,7 @@ import 'package:rider_app/configMap.dart';
 
 class AssistantMethods {
   static Future<String> searchCoordinateAddress(
-      Position position, context) async {
+      Position position, context, update) async {
     String placeAddress = "";
     String st1, st2, st3, st4, st5;
     String url =
@@ -28,8 +28,7 @@ class AssistantMethods {
       userPickUpAddress.latitude = position.latitude;
       userPickUpAddress.placeName = placeAddress;
 
-      Provider.of<AppData>(context, listen: false)
-          .updatePickUpLocationAddress(userPickUpAddress);
+      update(userPickUpAddress);
     }
 
     return placeAddress;
