@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -45,6 +46,21 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   double rideDetailsContainer = 0;
   double searchContainerHeight = 310;
+  double requestRideContainer = 0;
+
+  var colorizeColors = [
+    Colors.green,
+    Colors.purple,
+    Colors.pink,
+    Colors.blue,
+    Colors.yellow,
+    Colors.red,
+  ];
+
+  var colorizeTextStyle = TextStyle(
+    fontSize: 50.0,
+    fontFamily: 'Signatra',
+  );
 
   resetApp() {
     setState(() {
@@ -69,6 +85,15 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       rideDetailsContainer = 240;
       bottomPaddingOfMap = 240.0;
       drawerOpen = false;
+    });
+  }
+
+  void displayRequestRideContainer() {
+    setState(() {
+      requestRideContainer = 250;
+      rideDetailsContainer = 0;
+      bottomPaddingOfMap = 240.0;
+      drawerOpen = true;
     });
   }
 
@@ -500,7 +525,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: ElevatedButton(
                           onPressed: () {
-                            print("Requested");
+                            displayRequestRideContainer();
                           },
                           style: ButtonStyle(
                             foregroundColor: MaterialStatePropertyAll(
@@ -534,7 +559,101 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 ),
               ),
             ),
-          )
+          ),
+          Positioned(
+            bottom: 0.0,
+            left: 0.0,
+            right: 0.0,
+            child: AnimatedSize(
+              curve: Curves.bounceIn,
+              duration: new Duration(milliseconds: 160),
+              child: Container(
+                height: requestRideContainer,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16.0),
+                    bottomRight: Radius.circular(16.0),
+                  ),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      spreadRadius: 0.5,
+                      blurRadius: 16.0,
+                      color: Colors.black54,
+                      offset: Offset(0.7, 0.7),
+                    ),
+                  ],
+                ),
+                // height: 250.0,
+                child: Padding(
+                  padding: EdgeInsets.all(30.0),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 12.0,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: AnimatedTextKit(
+                          animatedTexts: [
+                            ColorizeAnimatedText(
+                              'Requesting a Ride',
+                              textStyle: colorizeTextStyle,
+                              colors: colorizeColors,
+                              textAlign: TextAlign.center,
+                            ),
+                            ColorizeAnimatedText(
+                              'Please wait...',
+                              textStyle: colorizeTextStyle,
+                              colors: colorizeColors,
+                              textAlign: TextAlign.center,
+                            ),
+                            ColorizeAnimatedText(
+                              'Finding a driver...',
+                              textStyle: colorizeTextStyle,
+                              colors: colorizeColors,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                          isRepeatingAnimation: true,
+                          onTap: () {
+                            print("Tap Event");
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 22.0,
+                      ),
+                      Container(
+                        height: 60.0,
+                        width: 60.0,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(26.0),
+                          border: Border.all(
+                            width: 2.0,
+                            color: Colors.grey[300],
+                          ),
+                        ),
+                        child: Icon(Icons.close, size: 26.0),
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        child: Text(
+                          "Cancel Ride",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 12.0),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
