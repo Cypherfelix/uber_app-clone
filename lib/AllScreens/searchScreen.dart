@@ -214,6 +214,10 @@ class _SearchScreenState extends State<SearchScreen> {
         setState(() {
           placePredictionList = placesList;
         });
+      } else {
+        setState(() {
+          placePredictionList = [];
+        });
       }
 
       // Map<String, dynamic> map = jsonDecode(res.toString());
@@ -324,6 +328,7 @@ class PredictionTile extends StatelessWidget {
       print(address.placeName);
 
       Navigator.pop(context);
+      Navigator.pop(context, "obtainDirections");
     }
   }
 }
