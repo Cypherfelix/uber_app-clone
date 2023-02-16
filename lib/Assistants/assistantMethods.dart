@@ -60,4 +60,17 @@ class AssistantMethods {
     print(directionDetails == null);
     return directionDetails;
   }
+
+  static int calculateFares(DirectionDetails directionDetails) {
+//in terms USD
+    double timeTraveledFare = (directionDetails.durationValue / 60) * 0;
+    double distanceTraveledFare =
+        (directionDetails.distanceValue / 1000) * 0.27;
+    double totalFareAmount = timeTraveledFare + distanceTraveledFare;
+    totalFareAmount = totalFareAmount * 150;
+//Local Currency
+//1$ = 160 RS
+//double total LocalAmount = total FareAmount * 160;
+    return totalFareAmount.truncate();
+  }
 }

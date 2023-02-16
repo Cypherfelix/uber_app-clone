@@ -11,6 +11,8 @@ import 'package:rider_app/AllWidgets/DividerWidget.dart';
 import 'package:rider_app/AllWidgets/progressDialog.dart';
 import 'package:rider_app/Assistants/assistantMethods.dart';
 import 'package:rider_app/DataHandler/appData.dart';
+import 'package:rider_app/Models/DirectionDetails.dart';
+import 'package:intl/intl.dart';
 
 class MainScreen extends StatefulWidget {
   static const String idScreen = "main";
@@ -28,7 +30,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
+  DirectionDetails tripDirectionDetails;
+
   Position currentPosition;
+
+  bool drawerOpen = true;
 
   var geoLocator = Geolocator();
 
@@ -40,6 +46,21 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   double rideDetailsContainer = 0;
   double searchContainerHeight = 310;
 
+  resetApp() {
+    setState(() {
+      searchContainerHeight = 310;
+      rideDetailsContainer = 0;
+      bottomPaddingOfMap = 310.0;
+      drawerOpen = true;
+      markers.clear();
+      circles.clear();
+      polyLineSets.clear();
+      pLineCoordinates.clear();
+    });
+
+    locatePosition();
+  }
+
   void displayRideDetailsContainer() async {
     await getPlaceDirection();
 
@@ -47,6 +68,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       searchContainerHeight = 0;
       rideDetailsContainer = 240;
       bottomPaddingOfMap = 240.0;
+      drawerOpen = false;
     });
   }
 
@@ -184,11 +206,15 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             },
           ),
           Positioned(
-            top: 45.0,
+            top: 30.0,
             left: 22.0,
             child: GestureDetector(
               onTap: () {
-                scaffoldKey.currentState.openDrawer();
+                if (drawerOpen) {
+                  scaffoldKey.currentState.openDrawer();
+                } else {
+                  resetApp();
+                }
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -205,7 +231,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
                   child: Icon(
-                    Icons.menu,
+                    drawerOpen ? Icons.menu : Icons.close,
                     color: Colors.black,
                   ),
                   radius: 20.0,
@@ -418,7 +444,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   Text(
-                                    "10km",
+                                    ((tripDirectionDetails != null)
+                                        ? '${tripDirectionDetails.distanceText}'
+                                        : ''),
                                     style: TextStyle(
                                       fontSize: 16.0,
                                       fontFamily: "Brand-Bold",
@@ -426,6 +454,13 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                     ),
                                   ),
                                 ],
+                              ),
+                              Expanded(child: Container()),
+                              Text(
+                                ((tripDirectionDetails != null)
+                                    ? '${NumberFormat.simpleCurrency(name: 'KSH').format(AssistantMethods.calculateFares(tripDirectionDetails))}'
+                                    : ''),
+                                style: TextStyle(fontFamily: "Brand-Bold"),
                               )
                             ],
                           ),
@@ -519,6 +554,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     var details =
         await AssistantMethods.obtainPlaceDirection(initialPos, finalPos);
     Navigator.pop(context);
+
+    setState(() {
+      tripDirectionDetails = details;
+    });
+
     if (details != null) {
       PolylinePoints polyLinePoints = PolylinePoints();
       List<PointLatLng> decodedPolyLinePointsResult =
