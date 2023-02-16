@@ -1,11 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:provider/provider.dart';
+import 'package:rider_app/AllWidgets/DividerWidget.dart';
 import 'package:rider_app/Assistants/requestAssistant.dart';
 import 'package:rider_app/DataHandler/appData.dart';
 import 'package:rider_app/Models/Address.dart';
+import 'package:rider_app/Models/PlacesPrediction.dart';
+import 'package:rider_app/Models/placesPredictions.dart';
 import 'package:rider_app/configMap.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -18,6 +23,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   TextEditingController pickupTextEditingController = TextEditingController();
   TextEditingController dropoffTextEditingController = TextEditingController();
+  List<PlacePredictions> placePredictionList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -157,21 +163,116 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
           ),
+          (placePredictionList.length > 0)
+              ? Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 8.0,
+                    horizontal: 16.0,
+                  ),
+                  child: ListView.separated(
+                    padding: EdgeInsets.all(0.0),
+                    itemBuilder: (context, index) {
+                      return PredictionTile(
+                        placePrediction: placePredictionList[index],
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, index) =>
+                        DividerWidget(),
+                    itemCount: placePredictionList.length,
+                    shrinkWrap: true,
+                    physics: ClampingScrollPhysics(),
+                  ),
+                )
+              : Container(),
         ],
       ),
     );
   }
+
+  void findPlaces(String placename) async {
+    if (placename.length > 1) {
+      String url =
+          "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placename&components=country:ke&key=$mapKey";
+
+      var res = await RequestAssistant.getRequest(url, "json");
+
+      if (res.toString().toLowerCase() == "Failed".toLowerCase()) {
+        return;
+      }
+
+      print(res["status"]);
+      if (res["status"] == "OK") {
+        var predictions = res["predictions"];
+        var placesList = (predictions as List)
+            .map((e) => PlacePredictions.fromJson(e))
+            .toList();
+
+        setState(() {
+          placePredictionList = placesList;
+        });
+      }
+
+      // Map<String, dynamic> map = jsonDecode(res.toString());
+      // var myRootNode = Root.fromJson(map);
+
+      // print(myRootNode.predictions.length);
+    } else {
+      setState(() {
+        placePredictionList = [];
+      });
+    }
+  }
 }
 
-void findPlaces(String placename) async {
-  if (placename.length > 0) {
-    String url =
-        "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placename&components=country:ke&key=$mapKey";
+class PredictionTile extends StatelessWidget {
+  final PlacePredictions placePrediction;
 
-    var res = await RequestAssistant.getRequest(url);
+  const PredictionTile({Key key, this.placePrediction}) : super(key: key);
 
-    if (res.toString().toLowerCase() == "Failed".toLowerCase()) {
-      return;
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          SizedBox(
+            width: 10.0,
+          ),
+          Row(
+            children: [
+              Icon(Icons.add_location),
+              SizedBox(
+                width: 14.0,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      placePrediction.main_text,
+                      style: TextStyle(fontSize: 16.0),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(
+                      height: 3.0,
+                    ),
+                    Text(
+                      placePrediction.secondary_text,
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.grey,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            width: 10.0,
+          ),
+        ],
+      ),
+    );
   }
 }

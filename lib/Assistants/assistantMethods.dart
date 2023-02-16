@@ -13,7 +13,7 @@ class AssistantMethods {
     String url =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$mapKey";
 
-    var response = await RequestAssistant.getRequest(url);
+    var response = await RequestAssistant.getRequest(url, "json");
 
     if (response != "Failed") {
       // placeAddress = response["results"][0]["formatted_address"];
