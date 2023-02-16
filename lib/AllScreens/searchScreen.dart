@@ -6,6 +6,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:provider/provider.dart';
 import 'package:rider_app/AllWidgets/DividerWidget.dart';
+import 'package:rider_app/AllWidgets/progressDialog.dart';
 import 'package:rider_app/Assistants/requestAssistant.dart';
 import 'package:rider_app/DataHandler/appData.dart';
 import 'package:rider_app/Models/Address.dart';
@@ -163,6 +164,9 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
           ),
+          SizedBox(
+            height: 10.0,
+          ),
           (placePredictionList.length > 0)
               ? Padding(
                   padding: EdgeInsets.symmetric(
@@ -231,48 +235,95 @@ class PredictionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          SizedBox(
-            width: 10.0,
-          ),
-          Row(
-            children: [
-              Icon(Icons.add_location),
-              SizedBox(
-                width: 14.0,
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      placePrediction.main_text,
-                      style: TextStyle(fontSize: 16.0),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(
-                      height: 3.0,
-                    ),
-                    Text(
-                      placePrediction.secondary_text,
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.grey,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+    return TextButton(
+      onPressed: () {
+        getPlaceDetails(placePrediction.place_id, context);
+      },
+      style: ButtonStyle(
+        padding: MaterialStatePropertyAll(EdgeInsets.all(0.0)),
+      ),
+      child: Container(
+        child: Column(
+          children: [
+            SizedBox(
+              width: 8.0,
+            ),
+            Row(
+              children: [
+                Icon(Icons.add_location),
+                SizedBox(
+                  width: 14.0,
                 ),
-              ),
-            ],
-          ),
-          SizedBox(
-            width: 10.0,
-          ),
-        ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 4.0,
+                      ),
+                      Text(
+                        placePrediction.main_text,
+                        style: TextStyle(fontSize: 16.0),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(
+                        height: 2.0,
+                      ),
+                      Text(
+                        placePrediction.secondary_text,
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.grey,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(
+                        height: 4.0,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              width: 10.0,
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void getPlaceDetails(String placeId, context) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => ProgressDialog(
+        message: "Setting drop off. Please wait...",
+      ),
+    );
+
+    String url =
+        "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$mapKey";
+
+    var res = await RequestAssistant.getRequest(url, "json");
+
+    if (res == "Failed") {
+      return;
+    }
+
+    if (res["status"] == "OK") {
+      Address address = Address();
+      address.placeName = res["result"]["name"];
+      address.placeId = placeId;
+      address.latitude = res["result"]["geometry"]["location"]["lat"];
+      address.longitude = res["result"]["geometry"]["location"]["lng"];
+
+      Provider.of<AppData>(context, listen: false)
+          .updateDropOffLocationAddress(address);
+
+      print(address.placeName);
+
+      Navigator.pop(context);
+    }
   }
 }
