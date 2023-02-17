@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -14,6 +15,7 @@ import 'package:rider_app/Assistants/assistantMethods.dart';
 import 'package:rider_app/DataHandler/appData.dart';
 import 'package:rider_app/Models/DirectionDetails.dart';
 import 'package:intl/intl.dart';
+import 'package:rider_app/configMap.dart';
 
 class MainScreen extends StatefulWidget {
   static const String idScreen = "main";
@@ -48,6 +50,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   double searchContainerHeight = 310;
   double requestRideContainer = 0;
 
+  DatabaseReference rideRequestReference;
+
   var colorizeColors = [
     Colors.green,
     Colors.purple,
@@ -67,6 +71,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       searchContainerHeight = 310;
       rideDetailsContainer = 0;
       bottomPaddingOfMap = 310.0;
+      requestRideContainer = 0;
       drawerOpen = true;
       markers.clear();
       circles.clear();
@@ -95,6 +100,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       bottomPaddingOfMap = 240.0;
       drawerOpen = true;
     });
+
+    saveRideRequest();
   }
 
   void locatePosition() async {
@@ -135,6 +142,49 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     target: LatLng(37.42796133580664, -122.085749655962),
     zoom: 14.4746,
   );
+
+  void saveRideRequest() {
+    rideRequestReference =
+        FirebaseDatabase.instance.ref().child("Ride Request").push();
+
+    var initialPos =
+        Provider.of<AppData>(context, listen: false).pickUpLocation;
+    var finalPos = Provider.of<AppData>(context, listen: false).dropOffLocation;
+
+    Map pickUp = {
+      "latitude": initialPos.latitude,
+      "longitude": initialPos.longitude
+    };
+
+    Map dropOff = {
+      "latitude": finalPos.latitude,
+      "longitude": finalPos.longitude
+    };
+
+    Map rideInfoMap = {
+      "driver_id": "waiting",
+      "payment_method": "cash",
+      "pickup": pickUp,
+      "dropoff": dropOff,
+      "created_at": DateTime.now().toString(),
+      "rider_name": currentUser.name,
+      "rider_phone": currentUser.phone,
+      "pickup_address": initialPos.placeName,
+      "dropoff_address": finalPos.placeName,
+    };
+
+    rideRequestReference.set(rideInfoMap);
+  }
+
+  void cancelRideRequest() {
+    rideRequestReference.remove();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    AssistantMethods.getCurrentOnlineUserInfo();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -624,18 +674,24 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       SizedBox(
                         height: 22.0,
                       ),
-                      Container(
-                        height: 60.0,
-                        width: 60.0,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(26.0),
-                          border: Border.all(
-                            width: 2.0,
-                            color: Colors.grey[300],
+                      GestureDetector(
+                        onTap: () {
+                          cancelRideRequest();
+                          resetApp();
+                        },
+                        child: Container(
+                          height: 60.0,
+                          width: 60.0,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(26.0),
+                            border: Border.all(
+                              width: 2.0,
+                              color: Colors.grey[300],
+                            ),
                           ),
+                          child: Icon(Icons.close, size: 26.0),
                         ),
-                        child: Icon(Icons.close, size: 26.0),
                       ),
                       SizedBox(
                         height: 10.0,
@@ -647,7 +703,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 12.0),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
