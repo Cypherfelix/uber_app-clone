@@ -26,14 +26,14 @@ class LoginScreen extends StatelessWidget {
                 height: 35.0,
               ),
               Image(
-                image: AssetImage("images/logo.png"),
+                image: AssetImage("images/logo-nobg.png"),
                 width: 390.0,
                 height: 250.0,
                 alignment: Alignment.bottomCenter,
               ),
               SizedBox(height: 1.0),
               Text(
-                "Login as a Rider",
+                "Login User",
                 style: TextStyle(fontSize: 24.0, fontFamily: "Brand Bold"),
                 textAlign: TextAlign.center,
               ),
@@ -106,7 +106,7 @@ class LoginScreen extends StatelessWidget {
                                   borderRadius:
                                       new BorderRadius.circular(24.0))),
                           backgroundColor:
-                              MaterialStatePropertyAll(Colors.yellow)),
+                              MaterialStatePropertyAll(Colors.blue)),
                     ),
                   ],
                 ),

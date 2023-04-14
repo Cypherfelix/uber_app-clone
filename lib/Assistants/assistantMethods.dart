@@ -66,16 +66,31 @@ class AssistantMethods {
   }
 
   static int calculateFares(DirectionDetails directionDetails) {
-//in terms USD
-    double timeTraveledFare = (directionDetails.durationValue / 60) * 0;
+    double timeTraveledFare = (directionDetails.durationValue / 60);
     double distanceTraveledFare =
         (directionDetails.distanceValue / 1000) * 0.27;
     double totalFareAmount = timeTraveledFare + distanceTraveledFare;
     totalFareAmount = totalFareAmount * 150;
-//Local Currency
-//1$ = 160 RS
-//double total LocalAmount = total FareAmount * 160;
     return totalFareAmount.truncate();
+  }
+
+  static int getFareForCar(DirectionDetails directionDetails, int baseFare) {
+    // Define the base fare, cost per km, and cost per minute.
+    double minimumFare = 120.50;
+    double costPerKm = 16.50;
+    double costPerMinute = 3.50;
+    int distanceKm = directionDetails.durationValue ~/ 60;
+    int timeMinutes = directionDetails.distanceValue ~/ 1000;
+
+    // Calculate the distance and time components of the fare.
+    double distanceFare = distanceKm * costPerKm;
+    double timeFare = timeMinutes * costPerMinute;
+
+    // Combine the distance and time components to get the total fare.
+    double totalFare = baseFare + distanceFare + timeFare;
+
+    // Return the total fare, with a minimum of the minimum fare.
+    return (totalFare > minimumFare ? totalFare : minimumFare).toInt();
   }
 
   static void getCurrentOnlineUserInfo() async {

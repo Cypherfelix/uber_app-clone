@@ -30,14 +30,14 @@ class RegistrationScreen extends StatelessWidget {
                 height: 25.0,
               ),
               Image(
-                image: AssetImage("images/logo.png"),
+                image: AssetImage("images/logo-nobg.png"),
                 width: 390.0,
                 height: 250.0,
                 alignment: Alignment.bottomCenter,
               ),
               SizedBox(height: 1.0),
               Text(
-                "Register as a Rider",
+                "Register User",
                 style: TextStyle(fontSize: 24.0, fontFamily: "Brand Bold"),
                 textAlign: TextAlign.center,
               ),
@@ -170,8 +170,7 @@ class RegistrationScreen extends StatelessWidget {
                         shape: MaterialStatePropertyAll(
                             new RoundedRectangleBorder(
                                 borderRadius: new BorderRadius.circular(24.0))),
-                        backgroundColor:
-                            MaterialStatePropertyAll(Colors.yellow),
+                        backgroundColor: MaterialStatePropertyAll(Colors.blue),
                       ),
                     ),
                   ],

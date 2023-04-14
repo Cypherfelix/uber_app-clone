@@ -67,7 +67,10 @@ flutter:
     - images/redmarker.png
     - images/taxi.png
     - images/user_icon.png
-
+    - images/logo-nobg.png
+    - images/bus-nobg.png
+    - images/ride-nobg.png
+    - images/saloon-nobg.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
